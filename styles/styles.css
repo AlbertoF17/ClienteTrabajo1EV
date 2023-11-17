@@ -1,0 +1,28 @@
+.product img {
+    width: 6rem;
+}
+
+.product {
+    width: 20vw;
+    border: 1px solid black;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#products-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5rem;
+    justify-content: center;
+    align-items: stretch;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+}
