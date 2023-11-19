@@ -53,6 +53,37 @@ if (window.location.pathname.endsWith("index.html")) {
     const productsContainer = document.getElementById("products-container");
     displayProducts(productsContainer);
 
+    async function fetchCategories() {
+        try {
+            const response = await fetch("https://fakestoreapi.com/products/categories");
+            const categories = await response.json();
+    
+            const selectElement = document.getElementById("category-select");
+    
+            categories.forEach(category => {
+                const option = document.createElement("option");
+                option.value = category;
+                option.text = category;
+                selectElement.appendChild(option);
+            });
+    
+            // Agregar el evento de cambio después de crear las opciones
+            selectElement.addEventListener("change", function() {
+                const selectedCategory = selectElement.value;
+    
+                fetch(`https://fakestoreapi.com/products/category/${selectedCategory}`)
+                    .then(res => res.json())
+                    .then(json => console.log(json))
+                    .catch(error => console.error("Error fetching products:", error));
+            });
+    
+            return categories; // Devuelve las categorías
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+            return []; // Devuelve un array vacío en caso de error
+        }
+    }
+
     function checkLoggedIn() {
         const currentUser = sessionStorage.getItem("user");
         if (!currentUser) {
