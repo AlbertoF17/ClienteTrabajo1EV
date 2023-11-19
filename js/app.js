@@ -49,15 +49,9 @@ class Product {
 }
 
 if (window.location.pathname.endsWith("index.html")) {
-    document.addEventListener("DOMContentLoaded", function () {
-        const isIndex = window.location.pathname.endsWith("index.html");
-        if (isIndex) {
-            checkLoggedIn();
-        }
-
-        const productsContainer = document.getElementById("products-container");
-        displayProducts(productsContainer);
-    });
+    checkLoggedIn();
+    const productsContainer = document.getElementById("products-container");
+    displayProducts(productsContainer);
 
     function checkLoggedIn() {
         const currentUser = sessionStorage.getItem("user");
