@@ -50,15 +50,22 @@ class Product {
 
 if (window.location.pathname.endsWith("index.html")) {
     checkLoggedIn();
-    const productsContainer = document.getElementById("products-container");
-    displayProducts(productsContainer);
+    fetchCategories();
+    displayProducts(fetchProducts());
+
+    function checkLoggedIn() {
+        const currentUser = sessionStorage.getItem("user");
+        if (!currentUser) {
+            window.location.href = "pages/session.html";
+        }
+    }
 
     async function fetchCategories() {
         try {
             const response = await fetch("https://fakestoreapi.com/products/categories");
             const categories = await response.json();
     
-            const selectElement = document.getElementById("category-select");
+            const selectElement = document.querySelector("#category-select");
     
             categories.forEach(category => {
                 const option = document.createElement("option");
@@ -67,7 +74,6 @@ if (window.location.pathname.endsWith("index.html")) {
                 selectElement.appendChild(option);
             });
     
-            // Agregar el evento de cambio después de crear las opciones
             selectElement.addEventListener("change", function() {
                 const selectedCategory = selectElement.value;
     
@@ -84,12 +90,30 @@ if (window.location.pathname.endsWith("index.html")) {
         }
     }
 
-    function checkLoggedIn() {
-        const currentUser = sessionStorage.getItem("user");
-        if (!currentUser) {
-            window.location.href = "pages/session.html";
+    async function filterProductsByCategory() {
+        const selectElement = document.querySelector("#category-select");
+        const selectedCategory = selectElement.value;
+    
+        const productsContainer = document.querySelector("#products-container");
+        productsContainer.innerHTML = ""; // Limpiar el contenedor antes de agregar los productos filtrados
+    
+        if (selectedCategory === "all") {
+            // Si se selecciona la opción "all", mostrar todos los productos
+            const allProducts = await fetchProducts();
+            displayProducts(allProducts);
+        } else {
+            // Filtrar productos por la categoría seleccionada
+            try {
+                const response = await fetch(`https://fakestoreapi.com/products/category/${selectedCategory}`);
+                const filteredProducts = await response.json();
+                displayProducts(filteredProducts);
+            } catch (error) {
+                console.error("Error fetching filtered products:", error);
+            }
         }
     }
+    
+    
 
     async function fetchProducts() {
         try {
@@ -116,7 +140,7 @@ if (window.location.pathname.endsWith("index.html")) {
     }
 
     async function displayProducts(products) {
-        const productsContainer = document.getElementById("products-container");
+        const productsContainer = document.querySelector("#products-container");
         products = await fetchProducts();
         products.forEach(product => {
             const productDiv = document.createElement("div");
@@ -144,6 +168,16 @@ if (window.location.pathname.endsWith("index.html")) {
         // Redirigir a la página de inicio de sesión u otra acción después de cerrar sesión
         window.location.href = "pages/session.html";
     });
+
+    document.querySelector("#login-form").addEventListener("submit", login);
+    document.querySelector("#register-form").addEventListener("submit", register);
+    document.querySelector("#category-select").addEventListener("change", filterProductsByCategory);
+    document.querySelector("#add-product-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+        //addProduct();
+    });
+    document.querySelector("#confirm-purchase-btn").addEventListener("click", confirmPurchase);
+
 }
 
 if (window.location.pathname.endsWith("session.html")) {
@@ -284,7 +318,4 @@ if (window.location.pathname.endsWith("session.html")) {
             console.error('Error en la autenticación del usuario:', error);
         }
     }
-    
-    document.getElementById("login-form").addEventListener("submit", login);
-    document.getElementById("register-form").addEventListener("submit", register);
 }

@@ -12,23 +12,18 @@
 <body>
     <button id="logout-button">Cerrar Sesión</button>
     <div id="all-products-section">
-        <h2>All Products</h2>
-        <div id="products-container">
-        </div>
-    </div>
-
-    <div id="category-products-section">
-        <h2>Products by Category</h2>
-        <select id="category-select" onchange="filterProductsByCategory()">
+        <h2>Products</h2>
+        <select id="category-select">
+            <option value="all">All Categories</option>
         </select>
-        <div id="category-products-container">
+        <div id="products-container">
         </div>
     </div>
 
     <div id="add-product-section">
         <h2>Add Product</h2>
         <form id="add-product-form">
-            <button type="submit" onclick="addProduct()">Agregar Producto</button>
+            <button type="submit">Agregar Producto</button>
         </form>
     </div>
 
@@ -36,7 +31,7 @@
         <h2>Carrito de Compra</h2>
         <div id="cart-container">
         </div>
-        <button onclick="confirmPurchase()">Confirmar Compra</button>
+        <button id="confirm-purchase-btn">Confirmar Compra</button>
     </div>
 
     <div id="user-profile-section">
