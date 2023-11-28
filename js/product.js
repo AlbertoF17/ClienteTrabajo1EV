@@ -15,6 +15,13 @@ if (currentProduct) {
 }
 
 function productContent(product) {
+    const localProducts = JSON.parse(localStorage.getItem('products')) || [];
+    const matchingLocalProduct = localProducts.find(localProduct => localProduct.id == product.id);
+
+    if (matchingLocalProduct) {
+        product = matchingLocalProduct;
+    }
+
     const productDiv = document.querySelector("#product-details");
     const productInfo = document.querySelector("#product-info");
     const productTitle = document.createElement("h3");

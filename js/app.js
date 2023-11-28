@@ -16,6 +16,7 @@ const cartDropdown = document.querySelector("#cart-dropdown");
 
 document.getElementById("logout-button").addEventListener("click", function () {
     sessionStorage.removeItem("user");
+    window.location.reload();
 });
 
 if (!window.location.href.endsWith("index.html")) {
@@ -125,6 +126,25 @@ function handleConfirmPurchase(cartItems, totalCartPrice) {
         // Actualizar el perfil del usuario en localStorage
         localStorage.removeItem(`user_${currentUser.username}`);
         localStorage.setItem(`user_${currentUser.username}`, JSON.stringify(localStorageUser));
+
+        // Añadir un nuevo carrito a la API
+        fetch('https://fakestoreapi.com/carts', {
+            method: "POST",
+            body: JSON.stringify({
+                userId: currentUser.id,
+                date: currentDate.toISOString(),
+                products: cartItems.map(item => ({
+                    productId: item.id,
+                    quantity: item.quantity
+                }))
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => res.json())
+            .then(json => console.log(json))
+            .catch(error => console.error('Error al añadir un nuevo carrito a la API:', error));
 
         // Limpiar el carrito en sessionStorage
         sessionStorage.removeItem("cart");

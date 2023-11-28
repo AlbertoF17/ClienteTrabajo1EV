@@ -10,7 +10,7 @@
         // Configurar el listener para el formulario de edición
         setupEditFormListener(productId);
         // Llenar el dropdown de categorías
-        await populateCategoryDropdown();
+        await populateCategoryDropdown(product.category);  // Pasar la categoría del producto como argumento
     } else {
         console.error('Producto no encontrado.');
     }
@@ -18,6 +18,13 @@
     // Función asincrónica para obtener información de un producto por su ID
     async function fetchProductById(productId) {
         try {
+            const localProducts = JSON.parse(localStorage.getItem("products")) || [];
+            const matchingLocalProduct = localProducts.find(localProduct => localProduct.id === productId);
+
+            if (matchingLocalProduct) {
+                return matchingLocalProduct;
+            }
+
             const response = await fetch(`https://fakestoreapi.com/products/${productId}`);
 
             if (!response.ok) {
@@ -43,17 +50,6 @@
         }
     }
 
-
-    // Llenar el formulario con los valores del producto
-    function populateEditForm(product) {
-        document.getElementById('productId').value = product.id;
-        document.getElementById('title').value = product.title;
-        document.getElementById('price').value = product.price;
-        document.getElementById('category').value = product.category;
-        document.getElementById('description').value = product.description;
-        document.getElementById('image').value = product.image;
-    }
-
     // Configurar el listener para el formulario de edición
     function setupEditFormListener(productId) {
         const editProductForm = document.getElementById('editProductForm');
@@ -73,6 +69,8 @@
 
             // Actualizar el producto en el localStorage
             updateProductInLocalStorage(editedProduct);
+
+            window.location.href = "/pages/product.html";
         });
     }
 
@@ -89,8 +87,20 @@
         return allCategories;
     }
 
+    function getProductIdFromQueryString() {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const productId = urlParams.get('id');
+
+        if (!productId) {
+            console.error('Product ID not found in the query string.');
+        }
+
+        return productId;
+    }
+
     // Llenar el dropdown de categorías
-    async function populateCategoryDropdown() {
+    async function populateCategoryDropdown(productCategory) {
         const categories = await fetchCategories();
         const categoryDropdown = document.getElementById('category');
 
@@ -107,29 +117,26 @@
             option.textContent = category;
             categoryDropdown.appendChild(option);
         });
-    }
 
-    function getProductIdFromQueryString() {
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-        const productId = urlParams.get('id');
-    
-        if (!productId) {
-            console.error('Product ID not found in the query string.');
+        // Seleccionar la categoría del producto por defecto
+        if (productCategory) {
+            categoryDropdown.value = productCategory;
         }
-    
-        return productId;
     }
-    
 
+    function populateEditForm(product) {
+        document.getElementById('productId').value = product.id;
+        document.getElementById('title').value = product.title;
+        document.getElementById('price').value = product.price;
+        document.getElementById('description').value = product.description;
+        document.getElementById('image').value = product.image;
+    }
 
     function updateProductInLocalStorage(product) {
-        // Obtener productos existentes del localStorage
         const localStorageProducts = JSON.parse(localStorage.getItem('products')) || [];
-    
-        // Encontrar y actualizar el producto específico
+
         let productFound = false;
-    
+
         for (let i = 0; i < localStorageProducts.length; i++) {
             if (localStorageProducts[i].id === product.id) {
                 localStorageProducts[i] = product;
@@ -137,16 +144,13 @@
                 break;
             }
         }
-    
-        // Si el producto no se encontró, agregarlo al final del array
+
         if (!productFound) {
             localStorageProducts.push(product);
         }
-    
+
         // Guardar los productos actualizados en el localStorage
         localStorage.setItem('products', JSON.stringify(localStorageProducts));
     }
-    
-    
-    
+
 })();

@@ -2,7 +2,6 @@ const editProfileBtn = document.getElementById("edit-profile-btn");
 const profileInfo = document.getElementById("profile-info");
 const confirmedCartsList = document.getElementById("confirmed-carts");
 const currentUser = JSON.parse(sessionStorage.getItem("user"));
-const currentUserLocal = JSON.parse(localStorage.getItem(`user_${currentUser.username}`));
 
 // Función para llenar los campos de perfil con la información del usuario
 function fillProfileFields(user) {
@@ -17,7 +16,7 @@ function fillProfileFields(user) {
 }
 
 // Llenar los campos de perfil con la información del usuario actual
-fillProfileFields(currentUserLocal);
+fillProfileFields(currentUser);
 
 // Manejar el clic en el botón "Editar Perfil"
 editProfileBtn.addEventListener("click", function () {
@@ -64,7 +63,7 @@ function handleEditProfileClick() {
 }
 
 // Función para actualizar la información del usuario en el sessionStorage
-function updateUserInformation() {
+async function updateUserInformation() {
     // Obtener los valores de los campos de perfil
     const updatedUser = {
         username: document.getElementById("username").value,
@@ -76,21 +75,78 @@ function updateUserInformation() {
         phone: document.getElementById("phone").value,
         address: parseAddress(document.getElementById("address").value)
     };
-
-    // Actualizar el usuario en el sessionStorage
-    sessionStorage.setItem("user", JSON.stringify(updatedUser));
-    const localStorageUser = localStorage.getItem(`user_${currentUser.username}`);
-    if (localStorageUser) {
-        localStorage.removeItem(`user_${currentUser.username}`);
-        localStorage.setItem(`user_${updatedUser.username}`, JSON.stringify(updatedUser));
-    }
 }
+
+// Función para obtener la geolocalización según la dirección proporcionada
+async function updateLocationInfo(addressQuery) {
+    try {
+        // Obtener la dirección ingresada para la actualización del perfil
+        const updatedAddressQuery = `${updatedUser.address.street} ${updatedUser.address.number}, ${updatedUser.address.zipcode}, ${updatedUser.address.city}, ${updatedUser.address.village}`;
+
+        // Obtener la nueva geolocalización
+        const location = await updateLocationInfo(updatedAddressQuery, updatedUser);
+
+        // Agregar la geolocalización al objeto de dirección actualizado
+        updatedUser.address.geolocation = new Geolocation(location.lat, location.lng);
+
+        // Actualizar el usuario en el sessionStorage
+        sessionStorage.setItem("user", JSON.stringify(updatedUser));
+
+        // Actualizar el usuario en el localStorage si existe
+        const localStorageUser = localStorage.getItem(`user_${currentUser.username}`);
+        if (localStorageUser) {
+            localStorage.removeItem(`user_${currentUser.username}`);
+            localStorage.setItem(`user_${updatedUser.username}`, JSON.stringify(updatedUser));
+        }
+    } catch (error) {
+        console.error("Error al actualizar la información del usuario:", error);
+        alert("Error al actualizar la información del usuario. Por favor, inténtelo de nuevo.");
+    }
+
+    // Función para actualizar la información del usuario en el sessionStorage
+    async function updateUserInformation() {
+        // Obtener los valores de los campos de perfil
+        const updatedUser = {
+            username: document.getElementById("username").value,
+            email: document.getElementById("email").value,
+            name: {
+                firstname: document.getElementById("firstname").value,
+                lastname: document.getElementById("lastname").value
+            },
+            phone: document.getElementById("phone").value,
+            address: parseAddress(document.getElementById("address").value)
+        };
+
+        try {
+            // Obtener la dirección ingresada para la actualización del perfil
+            const updatedAddressQuery = `${updatedUser.address.street} ${updatedUser.address.number}, ${updatedUser.address.zipcode}, ${updatedUser.address.city}, ${updatedUser.address.village}`;
+
+            // Obtener la nueva geolocalización
+            const location = await updateLocationInfo(updatedAddressQuery, updatedUser);
+
+            // Agregar la geolocalización al objeto de dirección actualizado
+            updatedUser.address.geolocation = new Geolocation(location.lat, location.lng);
+
+            // Actualizar el usuario en el sessionStorage
+            sessionStorage.setItem("user", JSON.stringify(updatedUser));
+
+            // Actualizar el usuario en el localStorage si existe
+            const localStorageUser = localStorage.getItem(`user_${currentUser.username}`);
+            if (localStorageUser) {
+                localStorage.removeItem(`user_${currentUser.username}`);
+                localStorage.setItem(`user_${updatedUser.username}`, JSON.stringify(updatedUser));
+            }
+        } catch (error) {
+            console.error("Error al actualizar la información del usuario:", error);
+            alert("Error al actualizar la información del usuario. Por favor, inténtelo de nuevo.");
+        }
+    }
+
+}
+
 
 // Función para analizar la dirección ingresada y devolver un objeto de dirección
 function parseAddress(addressString) {
-    // Implementa la lógica para analizar la cadena de dirección y devolver un objeto de dirección
-    // Puedes utilizar expresiones regulares u otras técnicas según el formato esperado de la dirección
-    // Por ahora, simplemente dividimos la cadena por comas
     const addressParts = addressString.split(",");
     const streetNumber = addressParts[0].trim();
     const city = addressParts[1].trim();
@@ -104,6 +160,6 @@ function parseAddress(addressString) {
 }
 
 const purchaseHistoryBtn = document.querySelector("#purchase-history-btn");
-purchaseHistoryBtn.addEventListener("click", function() {
+purchaseHistoryBtn.addEventListener("click", function () {
     window.location.href = "purchaseHistory.html";
 })

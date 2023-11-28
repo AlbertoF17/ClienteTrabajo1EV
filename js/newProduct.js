@@ -33,9 +33,20 @@ fetch('https://fakestoreapi.com/products')
             localStorageProducts.push(newProduct);
             localStorage.setItem("products", JSON.stringify(localStorageProducts));
 
-
             // Optionally, you can reset the form
             productForm.reset();
+
+            // Make a request to the API to add the new product
+            fetch('https://fakestoreapi.com/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newProduct)
+            })
+                .then(apiRes => apiRes.json())
+                .then(apiJson => console.log('New product added to API:', apiJson))
+                .catch(apiError => console.error('Error adding product to API:', apiError));
 
             console.log('New product added to localStorage:', newProduct);
         });

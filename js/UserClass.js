@@ -1,5 +1,6 @@
 class User {
-    constructor(username, password, email, firstname, lastname, phone, address) {
+    constructor(id, username, password, email, firstname, lastname, phone, address) {
+        this.id = id;
         this.username = username;
         this.password = password;
         this.email = email;
@@ -8,13 +9,7 @@ class User {
             lastname: lastname
         };
         this.phone = phone;
-        this.address = {
-            city: address.city,
-            street: address.street,
-            number: address.number,
-            zipcode: address.zipcode,
-            geolocation: address.geolocation
-        };
+        this.address = address;
     }
 }
 

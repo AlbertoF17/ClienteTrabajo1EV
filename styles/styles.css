@@ -293,4 +293,5 @@ button,
 
 #edit-product-form form textarea{
     max-width: 100%;
+    min-height: 10vh;
 }
