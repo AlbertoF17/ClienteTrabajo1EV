@@ -163,3 +163,5 @@ const purchaseHistoryBtn = document.querySelector("#purchase-history-btn");
 purchaseHistoryBtn.addEventListener("click", function () {
     window.location.href = "purchaseHistory.html";
 })
+
+//GEOLOCATION NO SE GUARDA AL ACTUALIZAR EL PERFIL
