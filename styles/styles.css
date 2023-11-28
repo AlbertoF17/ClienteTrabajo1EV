@@ -264,3 +264,33 @@ button,
     overflow: auto;
     max-width: 100%;
 }
+
+#product-info div button {
+    width: 4rem;
+}
+
+.edit-product-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#edit-product-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap:2rem;
+    width: 60%;
+}
+
+#edit-product-form form{
+    display: flex;
+    gap:1rem;
+    width: 60%;
+}
+
+#edit-product-form form textarea{
+    max-width: 100%;
+}

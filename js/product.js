@@ -55,4 +55,13 @@ function productContent(product) {
     productPrice.style.margin = "0";
     productCategory.style.margin = "0";
     productDescription.style.margin = "0";
+    productEditButton.addEventListener("click", function () {
+        const url = new URL('/pages/editProduct.html', window.location.origin);
+        url.searchParams.set('id', `${product.id}`);
+        window.location.href = url.href;
+    });
+
+    productDeleteButton.addEventListener("click", function () {
+
+    });
 }
