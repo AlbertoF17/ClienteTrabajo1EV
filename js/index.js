@@ -3,9 +3,9 @@ function checkLoggedIn() {
     return currentUser;
 }
 
-// if (checkLoggedIn() === null) {
-//     window.location.href = "pages/session.html";
-// }
+if (checkLoggedIn() === null) {
+    window.location.href = "pages/session.html";
+}
 
 const categorySelector = document.querySelector("#category-select");
 const productsContainer = document.querySelector("#products-container");
