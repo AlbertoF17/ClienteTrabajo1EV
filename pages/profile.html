@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="../styles/styles.css">
+    <script src="../js/UserClass.js" defer></script>
+    <script src="../js/ProductClass.js" defer></script>
+    <script src="../js/app.js" defer></script>
+    <script src="../js/profile.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <div id="cart-section">
+            <button id="return">Return</button>
+            <div class="dropdown">
+                <button id="cart-dropdown-btn">Cart</button>
+                <div id="cart-dropdown" class="dropdown-content">
+                </div>
+            </div>
+        </div>
+        <h1>TIENDA ONLINE</h1>
+        <div class="dropdown">
+            <img class="profile-image" src="../media/profile.png">
+            <div id="profile-dropdown" class="dropdown-content">
+                <a href="/pages/profile.html">Go to profile</a>
+                <a id="logout-button" >Log out</a>
+            </div>
+        </div>
+    </header>
+    <div class="profile-container">
+        <h1>User Profile</h1>
+
+        <div class="profile-info" id="profile-info">
+            <!-- Campos de perfil aquí -->
+            <label for="username">Username:</label>
+            <input type="text" id="username" disabled>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" disabled>
+
+            <label for="firstname">First Name:</label>
+            <input type="text" id="firstname" disabled>
+
+            <label for="lastname">Last Name:</label>
+            <input type="text" id="lastname" disabled>
+
+            <label for="phone">Phone:</label>
+            <input type="tel" id="phone" disabled>
+
+            <label for="address">Address:</label>
+            <textarea id="address" rows="4" disabled></textarea>
+        </div>
+        <div>
+            <button id="edit-profile-btn">Edit Profile</button>
+            <button id="purchase-history-btn">Purchase History</button>
+        </div>
+    </div>
+</body>
+
+</html>
