@@ -1,9 +1,18 @@
+*{
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 1rem;
+}
+
 .product img {
     width: 6rem;
 }
 
 .product {
-    width: 20vw;
+    width: 24vw;
     border: 1px solid black;
     border-radius: 0.5rem;
     padding: 2rem;
@@ -16,13 +25,242 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 5rem;
+    gap: 4rem;
     justify-content: center;
     align-items: stretch;
+}
+
+#products-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#add-product-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#user-profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#category-select {
+    margin: 1rem;
+    padding: 0.25rem;
+    width: 30%;
 }
 
 form {
     display: flex;
     flex-direction: column;
     width: 60%;
+}
+
+.profile-image {
+    width: 4rem;
+}
+
+#cart-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;   
+}
+
+#cart-section button {
+    width: 4rem;
+}
+
+#cart-dropdown {
+    display: none;
+    position: absolute;
+    left:0;
+    width: 25rem;
+    background-color: white;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border: 1px solid black;
+    border-radius: 0.5rem;
+}
+
+#cart-dropdown.active {
+    display: block;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+}
+
+.product-btns {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+}
+
+#cart-dropdown {
+    max-height: 40vh;
+    overflow: auto;
+}
+
+.cart-product {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.cart-product img {
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+    width: 3rem;
+}
+
+.cart-product p {
+    margin: 0;
+    width: 5rem;
+}
+
+#confirm-purchase-btn {
+    margin-bottom: 0.2rem;
+}
+
+div:has(.profile-image):hover {
+    background-color: #ddd;
+}
+
+/* Estilos para el contenedor del menú desplegable */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Estilos para el contenido del menú desplegable */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: -5.5rem;
+    background-color: #f9f9f9;
+    min-width: 10rem;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    margin-right: 5rem;
+}
+
+/* Estilos para los enlaces dentro del menú desplegable */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+}
+
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+.show {
+    display: block;
+}
+
+.purchase-history-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    width: 30vw;
+    gap: 0.25rem;
+}
+
+.cart-products {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 3rem;
+}
+
+.cart-products p,
+.cart-products img {
+    width: 7rem;
+}
+
+#purchase-history-div {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+#purchase-history-div>div {
+    border: 1px solid black;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+button,
+.profile-image {
+    cursor: pointer;
+}
+
+.floating-button {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background-color: #266996;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 4rem;
+    height: 4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: bolder;
+    box-shadow: 3px 3px 7px black;
+}
+
+.new-product-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.new-product-container form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 30vw;
+}
+
+.new-product-container form button{
+    margin-top: 2rem;
+}
+
+.new-product-container form textarea{
+    overflow: auto;
+    max-width: 100%;
 }
