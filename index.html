@@ -5,50 +5,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles/styles.css">
-    <script src="js/ProductClass.js" defer></script>
     <script src="js/UserClass.js" defer></script>
+    <script src="js/ProductClass.js" defer></script>
     <script src="js/app.js" defer></script>
     <script src="js/index.js" defer></script>
     <title>Tienda Web</title>
 </head>
 
 <body>
-    <button id="logout-button">Cerrar Sesión</button>
-    <div id="all-products-section">
-        <h2>All Products</h2>
+    <header>
+        <div id="cart-section">
+            <div class="dropdown">
+                <button id="cart-dropdown-btn">Cart</button>
+                <div id="cart-dropdown" class="dropdown-content">
+                </div>
+            </div>
+        </div>
+        <h1>TIENDA ONLINE</h1>
+        <div class="dropdown">
+            <img class="profile-image" src="media/profile.png">
+            <div id="profile-dropdown" class="dropdown-content">
+                <a href="/pages/profile.html">Ir al perfil</a>
+                <a id="logout-button" >Cerrar sesión</a>
+            </div>
+        </div>
+    </header>
+
+    <div id="products-section">
+        <h2>Products</h2>
+        <select id="category-select">
+            <option value="all">All Categories</option>
+        </select>
         <div id="products-container">
         </div>
     </div>
-
-    <div id="category-products-section">
-        <h2>Products by Category</h2>
-        <select id="category-select" onchange="filterProductsByCategory()">
-        </select>
-        <div id="category-products-container">
-        </div>
-    </div>
-
-    <div id="add-product-section">
-        <h2>Add Product</h2>
-        <form id="add-product-form">
-            <button type="submit" onclick="addProduct()">Agregar Producto</button>
-        </form>
-    </div>
-
-    <div id="cart-section">
-        <h2>Carrito de Compra</h2>
-        <div id="cart-container">
-        </div>
-        <button onclick="confirmPurchase()">Confirmar Compra</button>
-    </div>
-
-    <div id="user-profile-section">
-        <h2>User Profile</h2>
-        <div id="user-info">
-        </div>
-        <div id="past-carts">
-        </div>
-    </div>
+    <div id="addButton" class="floating-button">+</div>
 </body>
 
 </html>
