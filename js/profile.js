@@ -1,70 +1,44 @@
 const editProfileBtn = document.getElementById("edit-profile-btn");
 const profileInfo = document.getElementById("profile-info");
-const confirmedCartsList = document.getElementById("confirmed-carts");
 const currentUser = JSON.parse(sessionStorage.getItem("user"));
 
-// Función para llenar los campos de perfil con la información del usuario
 function fillProfileFields(user) {
     document.getElementById("username").value = user.username;
     document.getElementById("email").value = user.email;
     document.getElementById("firstname").value = user.name.firstname;
     document.getElementById("lastname").value = user.name.lastname;
     document.getElementById("phone").value = user.phone;
-
-    const address = user.address || {};
-    document.getElementById("address").value = `${address.street} ${address.number}, ${address.city}, ${address.zipcode}`;
+    document.getElementById("street").value = user.address.street;
+    document.getElementById("number").value = user.address.number;
+    document.getElementById("city").value = user.address.city;
+    document.getElementById("zipcode").value = user.address.zipcode;
 }
 
-// Llenar los campos de perfil con la información del usuario actual
+
 fillProfileFields(currentUser);
 
-// Manejar el clic en el botón "Editar Perfil"
 editProfileBtn.addEventListener("click", function () {
     // Habilitar la edición de los campos
-    const inputFields = profileInfo.querySelectorAll("input, textarea");
+    const inputFields = profileInfo.querySelectorAll("input");
     inputFields.forEach(field => {
         field.removeAttribute("disabled");
     });
-
-    // Cambiar el texto del botón a "Guardar Cambios"
     editProfileBtn.textContent = "Save Changes";
-
-    // Desvincular el evento click del botón para evitar múltiples clics
-    editProfileBtn.removeEventListener("click", handleEditProfileClick);
-
-    // Vincular el evento click a la función de guardar cambios
     editProfileBtn.addEventListener("click", handleSaveChangesClick);
 });
 
-// Función para manejar el clic en el botón "Guardar Cambios"
 function handleSaveChangesClick() {
-    const inputFields = profileInfo.querySelectorAll("input, textarea");
+    const inputFields = profileInfo.querySelectorAll("input");
     inputFields.forEach(field => {
         field.setAttribute("disabled", true);
     });
 
     editProfileBtn.textContent = "Edit Profile";
     editProfileBtn.removeEventListener("click", handleSaveChangesClick);
-    editProfileBtn.addEventListener("click", handleEditProfileClick);
     updateUserInformation();
 }
 
-// Función para manejar el clic en el botón "Editar Perfil" después de guardar cambios
-function handleEditProfileClick() {
-    // Habilitar la edición de los campos
-    const inputFields = profileInfo.querySelectorAll("input, textarea");
-    inputFields.forEach(field => {
-        field.removeAttribute("disabled");
-    });
-
-    editProfileBtn.textContent = "Save Changes";
-    editProfileBtn.removeEventListener("click", handleEditProfileClick);
-    editProfileBtn.addEventListener("click", handleSaveChangesClick);
-}
-
-// Función para actualizar la información del usuario en el sessionStorage
 async function updateUserInformation() {
-    // Obtener los valores de los campos de perfil
     const updatedUser = {
         username: document.getElementById("username").value,
         email: document.getElementById("email").value,
@@ -73,79 +47,55 @@ async function updateUserInformation() {
             lastname: document.getElementById("lastname").value
         },
         phone: document.getElementById("phone").value,
-        address: parseAddress(document.getElementById("address").value)
+        address: {
+            street: document.getElementById("street").value,
+            number: document.getElementById("number").value,
+            city: document.getElementById("city").value,
+            zipcode: document.getElementById("zipcode").value
+        }
     };
-}
 
-// Función para obtener la geolocalización según la dirección proporcionada
-async function updateLocationInfo(addressQuery) {
     try {
-        // Obtener la dirección ingresada para la actualización del perfil
-        const updatedAddressQuery = `${updatedUser.address.street} ${updatedUser.address.number}, ${updatedUser.address.zipcode}, ${updatedUser.address.city}, ${updatedUser.address.village}`;
-
-        // Obtener la nueva geolocalización
-        const location = await updateLocationInfo(updatedAddressQuery, updatedUser);
-
-        // Agregar la geolocalización al objeto de dirección actualizado
+        const updatedAddressQuery = `${updatedUser.address.street} ${updatedUser.address.number}, ${updatedUser.address.zipcode}, ${updatedUser.address.city}`;
+        const location = await updateLocationInfo(updatedAddressQuery);
         updatedUser.address.geolocation = new Geolocation(location.lat, location.lng);
-
-        // Actualizar el usuario en el sessionStorage
         sessionStorage.setItem("user", JSON.stringify(updatedUser));
 
-        // Actualizar el usuario en el localStorage si existe
         const localStorageUser = localStorage.getItem(`user_${currentUser.username}`);
         if (localStorageUser) {
             localStorage.removeItem(`user_${currentUser.username}`);
             localStorage.setItem(`user_${updatedUser.username}`, JSON.stringify(updatedUser));
         }
+
     } catch (error) {
         console.error("Error al actualizar la información del usuario:", error);
         alert("Error al actualizar la información del usuario. Por favor, inténtelo de nuevo.");
     }
-
-    // Función para actualizar la información del usuario en el sessionStorage
-    async function updateUserInformation() {
-        // Obtener los valores de los campos de perfil
-        const updatedUser = {
-            username: document.getElementById("username").value,
-            email: document.getElementById("email").value,
-            name: {
-                firstname: document.getElementById("firstname").value,
-                lastname: document.getElementById("lastname").value
-            },
-            phone: document.getElementById("phone").value,
-            address: parseAddress(document.getElementById("address").value)
-        };
-
-        try {
-            // Obtener la dirección ingresada para la actualización del perfil
-            const updatedAddressQuery = `${updatedUser.address.street} ${updatedUser.address.number}, ${updatedUser.address.zipcode}, ${updatedUser.address.city}, ${updatedUser.address.village}`;
-
-            // Obtener la nueva geolocalización
-            const location = await updateLocationInfo(updatedAddressQuery, updatedUser);
-
-            // Agregar la geolocalización al objeto de dirección actualizado
-            updatedUser.address.geolocation = new Geolocation(location.lat, location.lng);
-
-            // Actualizar el usuario en el sessionStorage
-            sessionStorage.setItem("user", JSON.stringify(updatedUser));
-
-            // Actualizar el usuario en el localStorage si existe
-            const localStorageUser = localStorage.getItem(`user_${currentUser.username}`);
-            if (localStorageUser) {
-                localStorage.removeItem(`user_${currentUser.username}`);
-                localStorage.setItem(`user_${updatedUser.username}`, JSON.stringify(updatedUser));
-            }
-        } catch (error) {
-            console.error("Error al actualizar la información del usuario:", error);
-            alert("Error al actualizar la información del usuario. Por favor, inténtelo de nuevo.");
-        }
-    }
-
 }
 
+async function updateLocationInfo(addressQuery) {
+    try {
+        const apiKey = 'pk.18b245c371788af6b51f41d6006bfc25';
+        const url = `https://us1.locationiq.com/v1/search.php?key=${apiKey}&format=json&q=${encodeURIComponent(addressQuery)}`;
 
-// Función para analizar la dirección ingresada y devolver un objeto de dirección
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.length > 0) {
+            const firstResult = data[0];
+            const location = {
+                lat: firstResult.lat,
+                lng: firstResult.lon
+            };
+            return location;
+        } else {
+            throw new Error('No se encontraron coordenadas para la dirección proporcionada.');
+        }
+    } catch (error) {
+        throw new Error(`Error al obtener las coordenadas: ${error}`);
+    }
+}
+
 function parseAddress(addressString) {
     const addressParts = addressString.split(",");
     const streetNumber = addressParts[0].trim();
@@ -162,6 +112,4 @@ function parseAddress(addressString) {
 const purchaseHistoryBtn = document.querySelector("#purchase-history-btn");
 purchaseHistoryBtn.addEventListener("click", function () {
     window.location.href = "purchaseHistory.html";
-})
-
-//GEOLOCATION NO SE GUARDA AL ACTUALIZAR EL PERFIL
+});

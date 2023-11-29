@@ -59,7 +59,7 @@ async function register(event) {
         if (!addUserResponse.ok) {
             throw new Error(`HTTP error! Status: ${addUserResponse.status}`);
         }
-
+        newUser.carts = [];
         // Guardar el nuevo usuario en el localStorage
         localStorage.setItem(`user_${newUser.username}`, JSON.stringify(newUser));
         alert("Registro exitoso. Inicie sesión con sus nuevas credenciales.");

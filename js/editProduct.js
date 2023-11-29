@@ -3,6 +3,9 @@
     // Manejar el evento de carga del documento
     const productId = getProductIdFromQueryString();
     const product = await fetchProductById(productId);
+    let deletedItems = JSON.parse(localStorage.getItem("deleted_items")) || [];
+    deletedItems.push(product);
+    localStorage.setItem("deleted_items", JSON.stringify(deletedItems));
 
     if (product) {
         // Llenar el formulario con los datos del producto
@@ -52,7 +55,7 @@
 
     // Configurar el listener para el formulario de edición
     function setupEditFormListener(productId) {
-        const editProductForm = document.getElementById('editProductForm');
+        const editProductForm = document.querySelector('#editProductForm');
 
         editProductForm.addEventListener('submit', function (event) {
             event.preventDefault();
@@ -60,12 +63,17 @@
             // Crear un objeto con los nuevos valores del producto
             const editedProduct = {
                 id: productId,
-                title: document.getElementById('title').value,
-                price: document.getElementById('price').value,
-                category: document.getElementById('category').value,
-                description: document.getElementById('description').value,
-                image: document.getElementById('image').value
+                title: document.querySelector('#title').value,
+                price: document.querySelector('#price').value,
+                category: document.querySelector('#category').value,
+                description: document.querySelector('#description').value,
+                image: document.querySelector('#image').value,
+                rating: {
+                    rate: document.querySelector('#ratingRate').value,
+                    count: document.querySelector('#ratingCount').value
+                }
             };
+            
 
             // Actualizar el producto en el localStorage
             updateProductInLocalStorage(editedProduct);
@@ -102,7 +110,7 @@
     // Llenar el dropdown de categorías
     async function populateCategoryDropdown(productCategory) {
         const categories = await fetchCategories();
-        const categoryDropdown = document.getElementById('category');
+        const categoryDropdown = document.querySelector('#category');
 
         const placeholderOption = document.createElement('option');
         placeholderOption.value = '';
@@ -125,16 +133,17 @@
     }
 
     function populateEditForm(product) {
-        document.getElementById('productId').value = product.id;
-        document.getElementById('title').value = product.title;
-        document.getElementById('price').value = product.price;
-        document.getElementById('description').value = product.description;
-        document.getElementById('image').value = product.image;
+        document.querySelector('#productId').value = parseInt(product.id);
+        document.querySelector('#title').value = product.title;
+        document.querySelector('#price').value = product.price;
+        document.querySelector('#description').value = product.description;
+        document.querySelector('#image').value = product.image;
+        document.querySelector('#ratingRate').value = product.rating.rate;
+        document.querySelector('#ratingCount').value = product.rating.count;
     }
 
     function updateProductInLocalStorage(product) {
         const localStorageProducts = JSON.parse(localStorage.getItem('products')) || [];
-
         let productFound = false;
 
         for (let i = 0; i < localStorageProducts.length; i++) {
@@ -152,5 +161,4 @@
         // Guardar los productos actualizados en el localStorage
         localStorage.setItem('products', JSON.stringify(localStorageProducts));
     }
-
 })();

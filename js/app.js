@@ -22,7 +22,6 @@ document.getElementById("logout-button").addEventListener("click", function () {
 if (!window.location.href.endsWith("index.html")) {
     const returnButton = document.querySelector("#return");
     returnButton.addEventListener("click", function (event) {
-        console.log("sexo");
         window.location.href = "../index.html";
     });
 
@@ -143,7 +142,6 @@ function handleConfirmPurchase(cartItems, totalCartPrice) {
             }
         })
             .then(res => res.json())
-            .then(json => console.log(json))
             .catch(error => console.error('Error al añadir un nuevo carrito a la API:', error));
 
         // Limpiar el carrito en sessionStorage

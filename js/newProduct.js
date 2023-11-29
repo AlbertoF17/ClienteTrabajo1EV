@@ -1,3 +1,7 @@
+// Fetch local products from localStorage
+const localStorageProducts = JSON.parse(localStorage.getItem('products')) || [];
+
+// Fetch products from FakeStoreAPI
 fetch('https://fakestoreapi.com/products')
     .then(res => res.json())
     .then(fakeStoreProducts => {
@@ -7,26 +11,27 @@ fetch('https://fakestoreapi.com/products')
         productForm.addEventListener('submit', function (event) {
             event.preventDefault();
 
-            // Get existing products from localStorage
-            const localStorageProducts = JSON.parse(localStorage.getItem('products')) || [];
-
-            // Combine product IDs from FakeStoreAPI and localStorage
+            // Combine product IDs from localStorage and FakeStoreAPI
             const allProductIds = [
-                ...fakeStoreProducts.map(product => product.id),
-                ...localStorageProducts.map(product => product.id)
+                ...localStorageProducts.map(product => product.id),
+                ...fakeStoreProducts.map(product => product.id)
             ];
 
-            // Find the next available ID
+            // Find the next available ID based on local products
             const nextAvailableId = findNextAvailableId(allProductIds);
 
             // Create a new product object with form values
             const newProduct = {
                 id: nextAvailableId,
                 title: document.getElementById('title').value,
-                price: document.getElementById('price').value,
+                price: parseFloat(document.getElementById('price').value),
                 category: document.getElementById('category').value,
                 description: document.getElementById('description').value,
-                image: document.getElementById('image').value
+                image: document.getElementById('image').value,
+                rating: {
+                    rate: 0,
+                    count: 0
+                }
             };
 
             // Add the new product to localStorage
@@ -49,21 +54,28 @@ fetch('https://fakestoreapi.com/products')
                 .catch(apiError => console.error('Error adding product to API:', apiError));
 
             console.log('New product added to localStorage:', newProduct);
+            window.location.href = '/../index.html';
         });
     })
     .catch(error => console.error('Error fetching products:', error));
 
 // Function to find the next available ID
 function findNextAvailableId(existingIds) {
-    const sortedIds = existingIds.sort((a, b) => a - b);
+    try {
+        const sortedIds = existingIds.sort((a, b) => a - b);
 
-    for (let i = 1; i <= sortedIds.length; i++) {
-        if (sortedIds[i - 1] !== i) {
-            return i;
+        for (let i = 1; i <= sortedIds.length; i++) {
+            if (sortedIds[i - 1] !== i) {
+                return i;
+            }
         }
-    }
 
-    return sortedIds.length + 1;
+        return sortedIds.length + 1;
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        // Manejar el error de alguna manera (lanzar o devolver un valor predeterminado)
+        throw error;
+    }
 }
 
 async function fetchCategories() {

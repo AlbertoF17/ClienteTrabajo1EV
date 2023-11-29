@@ -21,20 +21,20 @@ async function fetchProducts() {
         const apiProducts = await response.json();
 
         const localProducts = JSON.parse(localStorage.getItem("products")) || [];
+        const deletedItems = JSON.parse(localStorage.getItem("deleted_items")) || [];
 
-        const combinedProducts = localProducts.map(localProduct => {
-            const matchingApiProduct = apiProducts.find(apiProduct => apiProduct.id === localProduct.id);
-            return matchingApiProduct || localProduct;
-        });
+        // Filtrar productos eliminados antes de la combinación
+        const filteredLocalProducts = localProducts.filter(localProduct => !deletedItems.some(deletedItem => deletedItem.id === localProduct.id));
+        const filteredApiProducts = apiProducts.filter(apiProduct => !deletedItems.some(deletedItem => deletedItem.id === apiProduct.id));
 
-        // Agregar productos de la API que no existen en el localStorage
-        apiProducts.forEach(apiProduct => {
-            const existsInLocalStorage = localProducts.some(localProduct => localProduct.id == apiProduct.id);
-            
-            if (!existsInLocalStorage) {
-                combinedProducts.push(new Product(apiProduct.id, apiProduct.title, apiProduct.price, apiProduct.category, apiProduct.description, apiProduct.image));
-            }
-        });
+        // Crear un conjunto para mantener un registro de los IDs de productos eliminados
+        const deletedItemsSet = new Set(deletedItems.map(deletedItem => deletedItem.id));
+
+        // Combinar productos locales y filtrados de la API, evitando duplicados
+        const combinedProducts = [
+            ...filteredLocalProducts,
+            ...filteredApiProducts.filter(apiProduct => !deletedItemsSet.has(apiProduct.id))
+        ];
 
         return combinedProducts.sort((a, b) => a.id - b.id);
     } catch (error) {
@@ -115,15 +115,43 @@ async function displayProducts(products) {
 
     async function viewProduct(productId) {
         try {
+            // Intentar obtener el producto del localStorage
+            const localProducts = JSON.parse(localStorage.getItem('products')) || [];
+            const localProduct = localProducts.find(product => product.id === productId);
+    
+            if (localProduct) {
+                // Si se encuentra en el localStorage, usarlo directamente
+                sessionStorage.setItem('currentProduct', JSON.stringify(localProduct));
+                window.location.href = `pages/product.html?id=${productId}`;
+                return;
+            }
+    
+            // Si no se encuentra en el localStorage, hacer una solicitud a la API
             const response = await fetch(`https://fakestoreapi.com/products/${productId}`);
-            const product = await response.json();
-
-            sessionStorage.setItem('currentProduct', JSON.stringify(product));
-            window.location.href = `pages/product.html?id=${productId}`;
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            const contentType = response.headers.get('content-type');
+            const responseBody = await response.text();
+    
+            if (responseBody.trim() === '') {
+                throw new Error('Empty response body. No JSON data.');
+            }
+    
+            if (contentType && contentType.includes('application/json')) {
+                const apiProduct = JSON.parse(responseBody);
+                sessionStorage.setItem('currentProduct', JSON.stringify(apiProduct));
+                window.location.href = `pages/product.html?id=${productId}`;
+            } else {
+                throw new Error('Invalid content type. Expected JSON.');
+            }
         } catch (error) {
             console.error("Error fetching product:", error);
         }
     }
+    
 
     function addToCart(product) {
         try {
