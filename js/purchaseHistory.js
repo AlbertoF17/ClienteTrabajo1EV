@@ -1,118 +1,106 @@
-// Obtener el usuario actual del sessionStorage
-const currentUser = JSON.parse(sessionStorage.getItem("user"));
 const purchaseHistoryList = document.querySelector("#purchase-history-div");
 
-if (currentUser && currentUser.id) {
-    // Si el usuario actual tiene un ID, significa que es un usuario de la API
-    // Obtener todos los carritos y filtrar solo los del usuario actual
-    fetch('https://fakestoreapi.com/carts')
-        .then(res => res.json())
-        .then(allCarts => {
-            const userCarts = allCarts.filter(cart => cart.userId === currentUser.id);
+function createCartItem(cart, totalPrice) {
+    const cartItem = document.createElement("div");
+    const cartDate = document.createElement("p");
+    const cartProducts = cart.products;
 
-            if (userCarts.length > 0) {
-                // Obtener todos los productos
-                fetch('https://fakestoreapi.com/products')
-                    .then(res => res.json())
-                    .then(allProducts => {
-                        // Llenar la lista de historial de compras
-                        userCarts.forEach(cart => {
-                            const cartItem = document.createElement("div");
-                            const cartDate = document.createElement("p");
-                            const cartProducts = cart.products;
+    cartDate.textContent = `Date: ${cart.date}`;
+    cartItem.appendChild(cartDate);
 
-                            // Mapear los productos del carrito a información completa de productos
-                            const cartProductsInfo = cartProducts.map(cartProduct => {
-                                const productInfo = allProducts.find(product => product.id === cartProduct.productId);
-                                return {
-                                    ...cartProduct,
-                                    productInfo: productInfo
-                                };
-                            });
+    cartProducts.forEach(product => {
+        const productDiv = document.createElement("div");
+        productDiv.className = "cart-products";
+        const productTitle = document.createElement("p");
+        const productImage = document.createElement("img");
+        const productPrice = document.createElement("p");
+        const productQuantity = document.createElement("p");
 
-                            // Calcular el totalPrice sumando los precios de todos los productos en el carrito
-                            const totalPrice = cartProductsInfo.reduce((total, product) => {
-                                return total + (product.productInfo.price) * (product.quantity);
-                            }, 0);
+        productTitle.textContent = `${product.title || product.productInfo.title}`;
+        productImage.src = `${product.image || product.productInfo.image}`;
+        productPrice.textContent = `Price: ${product.price || product.productInfo.price} €`;
+        productQuantity.textContent = `Quantity: ${product.quantity}`;
 
-                            const cartPrice = document.createElement("p");
-                            cartDate.textContent = `Date: ${cart.date}`;
-                            cartPrice.textContent = `Total Price: ${totalPrice.toFixed(2)} €`;
-                            cartItem.appendChild(cartDate);
-
-                            cartProductsInfo.forEach(product => {
-                                const productDiv = document.createElement("div");
-                                productDiv.className = "cart-products";
-                                const productTitle = document.createElement("p");
-                                const productImage = document.createElement("img");
-                                const productPrice = document.createElement("p");
-                                const productQuantity = document.createElement("p");
-                                productTitle.textContent = `${product.productInfo.title}`;
-                                productImage.src = `${product.productInfo.image}`;
-                                productPrice.textContent = `Price: ${product.productInfo.price} €`;
-                                productQuantity.textContent = `Quantity: ${product.quantity}`;
-                                productDiv.appendChild(productTitle);
-                                productDiv.appendChild(productImage);
-                                productDiv.appendChild(productPrice);
-                                productDiv.appendChild(productQuantity);
-                                cartItem.appendChild(productDiv);
-                            });
-
-                            cartItem.appendChild(cartPrice);
-                            purchaseHistoryList.appendChild(cartItem);
-                        });
-                    })
-                    .catch(productError => {
-                        console.error('Error al obtener información de productos:', productError);
-                        // Manejar el error según tus necesidades
-                    });
-            } else {
-                // Si no hay historial de compras en la API para este usuario
-                const noHistoryItem = document.createElement("li");
-                noHistoryItem.textContent = "No purchase history available.";
-                purchaseHistoryList.appendChild(noHistoryItem);
-            }
-        })
-        .catch(error => {
-            console.error('Error al obtener los carritos del usuario:', error);
-            // Manejar el error según tus necesidades
-        });
-} else if (user && user.carts && user.carts.length > 0) {
-    // Si el usuario es del localStorage y tiene historial de compras
-    user.carts.forEach(cart => {
-        const cartItem = document.createElement("div");
-        const cartDate = document.createElement("p");
-        const cartProducts = cart.products;
-
-        const cartPrice = document.createElement("p");
-        cartDate.textContent = `Date: ${cart.date}`;
-        cartPrice.textContent = `Total Price: ${cart.totalPrice.toFixed(2)} €`;
-        cartItem.appendChild(cartDate);
-
-        cartProducts.forEach(product => {
-            const productDiv = document.createElement("div");
-            productDiv.className = "cart-products";
-            const productTitle = document.createElement("p");
-            const productImage = document.createElement("img");
-            const productPrice = document.createElement("p");
-            const productQuantity = document.createElement("p");
-            productTitle.textContent = `${product.title}`;
-            productImage.src = `${product.image}`;
-            productPrice.textContent = `Price: ${product.price} €`;
-            productQuantity.textContent = `Quantity: ${product.quantity}`;
-            productDiv.appendChild(productTitle);
-            productDiv.appendChild(productImage);
-            productDiv.appendChild(productPrice);
-            productDiv.appendChild(productQuantity);
-            cartItem.appendChild(productDiv);
-        });
-
-        cartItem.appendChild(cartPrice);
-        purchaseHistoryList.appendChild(cartItem);
+        productDiv.appendChild(productTitle);
+        productDiv.appendChild(productImage);
+        productDiv.appendChild(productPrice);
+        productDiv.appendChild(productQuantity);
+        cartItem.appendChild(productDiv);
     });
-} else {
-    // Si no hay historial de compras en la API ni en el objeto "user" del sessionStorage
-    const noHistoryItem = document.createElement("li");
+
+    const cartPrice = document.createElement("p");
+    cartPrice.textContent = `Total Price: ${totalPrice.toFixed(2)} €`;
+    cartItem.appendChild(cartPrice);
+
+    return cartItem;
+}
+
+function displayNoHistoryMessage() {
+    const noHistoryItem = document.createElement("div");
     noHistoryItem.textContent = "No purchase history available.";
     purchaseHistoryList.appendChild(noHistoryItem);
+}
+
+// Obtener el nombre del usuario actual del localStorage
+const username = JSON.parse(sessionStorage.getItem("user")).username;
+const currentUserKey = `user_${username}`;
+const currentUser = JSON.parse(localStorage.getItem(currentUserKey));
+
+if (currentUser) {
+    if (currentUser.carts && currentUser.carts.length > 0) {
+        currentUser.carts.reverse();
+
+        // Si el usuario del localStorage tiene historial de compras en la propiedad "carts"
+        currentUser.carts.forEach(cart => {
+            const totalPrice = cart.totalPrice || calculateTotalPrice(cart.products);
+            const cartItem = createCartItem(cart, totalPrice);
+            purchaseHistoryList.appendChild(cartItem);
+        });
+
+    }
+} else {
+    fetch('https://fakestoreapi.com/carts')
+    .then(res => res.json())
+    .then(allCarts => {
+        console.log(allCarts);
+        const userCarts = allCarts.forEach(cart => {
+            if (cart.userId == currentUser.id) {
+                userCarts.push(cart);
+            }
+        });
+
+        if (userCarts.length > 0) {
+            // Obtener todos los productos
+            fetch('https://fakestoreapi.com/products')
+                .then(res => res.json())
+                .then(allProducts => {
+                    userCarts.forEach(cart => {
+                        const totalPrice = calculateTotalPrice(cart.products, allProducts);
+                        const cartItem = createCartItem(cart, totalPrice);
+                        purchaseHistoryList.appendChild(cartItem);
+                        console.log(cartItem);
+                    });
+                })
+                .catch(productError => {
+                    console.error('Error al obtener información de productos:', productError);
+                    displayNoHistoryMessage();
+                });
+        } else {
+            // Si no hay historial de compras en la API para este usuario
+            displayNoHistoryMessage();
+        }
+    })
+    .catch(error => {
+        console.error('Error al obtener los carritos del usuario:', error);
+        displayNoHistoryMessage();
+    });
+}
+
+
+function calculateTotalPrice(cartProducts, allProducts) {
+    return cartProducts.reduce((total, product) => {
+        const productInfo = allProducts.find(p => p.id === product.productId);
+        const price = productInfo ? productInfo.price : 0;
+        return total + price * product.quantity;
+    }, 0);
 }
